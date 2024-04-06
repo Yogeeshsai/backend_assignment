@@ -1,0 +1,66 @@
+# billing_system/models.py
+from django.db import models
+
+class Employee(models.Model):
+    name = models.CharField(max_length=100)
+    # Add more fields as needed
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    # Add more fields as needed
+
+class Customer(models.Model):
+    name = models.CharField(max_length=100)
+    # Add more fields as needed
+
+class Bill(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    # Add more fields as needed
+Serializers: Create serializers for Employee, Product, Customer, and Bill models.
+python
+Copy code
+# billing_system/serializers.py
+from rest_framework import serializers
+from .models import Employee, Product, Customer, Bill
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+# Define serializers for Product, Customer, and Bill similarly
+Views: Use Django Rest Framework's Generic Views to handle CRUD operations for your models.
+python
+Copy code
+# billing_system/views.py
+from rest_framework import generics
+from .models import Employee, Product, Customer, Bill
+from .serializers import EmployeeSerializer, ProductSerializer, CustomerSerializer, BillSerializer
+
+class EmployeeListCreate(generics.ListCreateAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+# Define similar views for Product, Customer, and Bill
+URLs: Define URLs to map views to API endpoints.
+python
+Copy code
+# shopping_mall/urls.py
+from django.urls import path, include
+
+urlpatterns = [
+    path('api/', include('billing_system.urls')),
+]
+
+# billing_system/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('employees/', views.EmployeeListCreate.as_view()),
+    # Define URLs for other views
+]
